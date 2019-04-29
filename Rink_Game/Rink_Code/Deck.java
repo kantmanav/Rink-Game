@@ -49,8 +49,12 @@ public class Deck {
         size = cards.size();
     }
 
-    public Card getCard(int psn) {
-        return cards.get(psn);
+    public void addCard(String rank, String suit, int value) {
+        cards.add(new Card(rank, suit, value));
+    }
+    
+    public Card getCard(int i) {
+        
     }
     
     /**

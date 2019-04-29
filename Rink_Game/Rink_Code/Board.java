@@ -41,7 +41,7 @@ public abstract class Board {
 			System.out.println("----------");
 		}
 		for (int i = 0; i < originalDeck.size() / 2; i++) {
-		    compDeck.add(originalDeck.getCard(i));
+		    compDeck.addCard(rank, suit, value);
 		}
 		dealMyCards();
 	}
@@ -51,7 +51,7 @@ public abstract class Board {
 	 * dealing some cards to this board.
 	 */
 	public void newGame() {
-		deck.shuffle();
+		originalDeck.shuffle();
 		dealMyCards();
 	}
 
