@@ -8,130 +8,143 @@ import java.util.ArrayList;
  */
 public abstract class Board {
 
-	/**
-	 * The cards on this board.
-	 */
-	private Card[] cards;
+    /**
+     * The cards on this board.
+     */
+    private Card[] cards;
 
-	/**
-	 * The deck of cards being used to play the current game.
-	 */
-	private Deck originalDeck;
-	private Deck compDeck;
-	private Deck playerDeck;
+    /**
+     * The deck of cards being used to play the current game.
+     */
+    private Deck originalDeck;
+    private Deck compDeck = new Deck();
+    private Deck playerDeck = new Deck();
 
-	/**
-	 * Flag used to control debugging print statements.
-	 */
-	private static final boolean I_AM_DEBUGGING = false;
+    /**
+     * Flag used to control debugging print statements.
+     */
+    private static final boolean I_AM_DEBUGGING = false;
 
-	/**
-	 * Creates a new <code>Board</code> instance.
-	 * @param size the number of cards in the board
-	 * @param ranks the names of the card ranks needed to create the deck
-	 * @param suits the names of the card suits needed to create the deck
-	 * @param pointValues the integer values of the cards needed to create
-	 *                    the deck
-	 */
-	public Board(int size, String[] ranks, String[] suits, int[] pointValues) {
-		cards = new Card[size];
-		originalDeck = new Deck(ranks, suits, pointValues);
-		if (I_AM_DEBUGGING) {
-			System.out.println(originalDeck);
-			System.out.println("----------");
-		}
-		for (int i = 0; i < originalDeck.size() / 2; i++) {
-		    compDeck.addCard(rank, suit, value);
-		}
-		dealMyCards();
-	}
+    /**
+     * Creates a new <code>Board</code> instance.
+     * @param size the number of cards in the board
+     * @param ranks the names of the card ranks needed to create the deck
+     * @param suits the names of the card suits needed to create the deck
+     * @param pointValues the integer values of the cards needed to create
+     *                    the deck
+     */
+    public Board(int size, String[] ranks, String[] suits, int[] pointValues) {
+        cards = new Card[size];
+        originalDeck = new Deck(ranks, suits, pointValues);
+        if (I_AM_DEBUGGING) {
+            System.out.println(originalDeck);
+            System.out.println("----------");
+        }
+        for (int i = 0; i < originalDeck.size() / 2; i++) {
+            Card card = new Card(originalDeck.getCard(i).rank(), originalDeck.getCard(i).suit(), originalDeck.getCard(i).pointValue());
+            if (I_AM_DEBUGGING) {
+                System.out.println(card);
+            }
+            compDeck.addCard(card);
+        }
+        for (int j = originalDeck.size() / 2; j < originalDeck.size(); j++) {
+            Card card = new Card(originalDeck.getCard(j).rank(), originalDeck.getCard(j).suit(), originalDeck.getCard(j).pointValue());
+            if (I_AM_DEBUGGING) {
+                System.out.println(card);
+            }
+            playerDeck.addCard(card);
+        }
+        System.out.println(compDeck);
+        System.out.println(playerDeck);
+        dealMyCards();
+    }
 
-	/**
-	 * Start a new game by shuffling the deck and
-	 * dealing some cards to this board.
-	 */
-	public void newGame() {
-		originalDeck.shuffle();
-		dealMyCards();
-	}
+    /**
+     * Start a new game by shuffling the deck and
+     * dealing some cards to this board.
+     */
+    public void newGame() {
+        originalDeck.shuffle();
+        dealMyCards();
+    }
 
-	/**
-	 * Accesses the size of the board.
-	 * Note that this is not the number of cards it contains,
-	 * which will be smaller near the end of a winning game.
-	 * @return the size of the board
-	 */
-	public int size() {
-		return cards.length;
-	}
+    /**
+     * Accesses the size of the board.
+     * Note that this is not the number of cards it contains,
+     * which will be smaller near the end of a winning game.
+     * @return the size of the board
+     */
+    public int size() {
+        return cards.length;
+    }
 
-	/**
-	 * Determines if the board is empty (has no cards).
-	 * @return true if this board is empty; false otherwise.
-	 */
-	public boolean isEmpty() {
-		for (int k = 0; k < cards.length; k++) {
-			if (cards[k] != null) {
-				return false;
-			}
-		}
-		return true;
-	}
+    /**
+     * Determines if the board is empty (has no cards).
+     * @return true if this board is empty; false otherwise.
+     */
+    public boolean isEmpty() {
+        for (int k = 0; k < cards.length; k++) {
+            if (cards[k] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	/**
-	 * Deal a card to the kth position in this board.
-	 * If the deck is empty, the kth card is set to null.
-	 * @param k the index of the card to be dealt.
-	 */
-	public void deal(int k) {
-		cards[k] = deck.deal();
-	}
+    /**
+     * Deal a card to the kth position in this board.
+     * If the deck is empty, the kth card is set to null.
+     * @param k the index of the card to be dealt.
+     */
+    public void deal(int k) {
+        cards[k] = originalDeck.deal();
+    }
 
-	/**
-	 * Accesses the deck's size.
-	 * @return the number of undealt cards left in the deck.
-	 */
-	public int deckSize() {
-		return deck.size();
-	}
+    /**
+     * Accesses the deck's size.
+     * @return the number of undealt cards left in the deck.
+     */
+    public int deckSize() {
+        return originalDeck.size();
+    }
 
-	/**
-	 * Accesses a card on the board.
-	 * @return the card at position k on the board.
-	 * @param k is the board position of the card to return.
-	 */
-	public Card cardAt(int k) {
-		return cards[k];
-	}
+    /**
+     * Accesses a card on the board.
+     * @return the card at position k on the board.
+     * @param k is the board position of the card to return.
+     */
+    public Card cardAt(int k) {
+        return cards[k];
+    }
 
-	/**
-	 * Replaces selected cards on the board by dealing new cards.
-	 * @param selectedCards is a list of the indices of the
-	 *        cards to be replaced.
-	 */
-	public void replaceSelectedCards(List<Integer> selectedCards) {
-		for (Integer k : selectedCards) {
-			deal(k.intValue());
-		}
-	}
+    /**
+     * Replaces selected cards on the board by dealing new cards.
+     * @param selectedCards is a list of the indices of the
+     *        cards to be replaced.
+     */
+    public void replaceSelectedCards(List<Integer> selectedCards) {
+        for (Integer k : selectedCards) {
+            deal(k.intValue());
+        }
+    }
 
-	/**
-	 * Gets the indexes of the actual (non-null) cards on the board.
-	 *
-	 * @return a List that contains the locations (indexes)
-	 *         of the non-null entries on the board.
-	 */
-	public List<Integer> cardIndexes() {
-		List<Integer> selected = new ArrayList<Integer>();
-		for (int k = 0; k < cards.length; k++) {
-			if (cards[k] != null) {
-				selected.add(new Integer(k));
-			}
-		}
-		return selected;
-	}
+    /**
+     * Gets the indexes of the actual (non-null) cards on the board.
+     *
+     * @return a List that contains the locations (indexes)
+     *         of the non-null entries on the board.
+     */
+    public List<Integer> cardIndexes() {
+        List<Integer> selected = new ArrayList<Integer>();
+        for (int k = 0; k < cards.length; k++) {
+            if (cards[k] != null) {
+                selected.add(new Integer(k));
+            }
+        }
+        return selected;
+    }
 
-	/**
+        /**
 	 * Generates and returns a string representation of this board.
 	 * @return the string version of this board.
 	 */
@@ -150,7 +163,7 @@ public abstract class Board {
 	 *         false otherwise.
 	 */
 	public boolean gameIsWon() {
-		if (deck.isEmpty()) {
+		if (compDeck.isEmpty()) {
 			for (Card c : cards) {
 				if (c != null) {
 					return false;
@@ -183,7 +196,7 @@ public abstract class Board {
 	 */
 	private void dealMyCards() {
 		for (int k = 0; k < cards.length; k++) {
-			cards[k] = deck.deal();
+			cards[k] = originalDeck.deal();
 		}
 	}
 }

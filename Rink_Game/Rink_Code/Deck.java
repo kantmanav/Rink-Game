@@ -11,7 +11,6 @@ public class Deck {
     /**
      * cards contains all the cards in the deck.
      */
-    private List<Card> originalCards;
     private List<Card> cards;
 
     /**
@@ -31,30 +30,28 @@ public class Deck {
      * @param values is an array containing all of the card point values.
      */
     public Deck(String[] ranks, String[] suits, int[] values) {
-        originalCards = new ArrayList<Card>();
         cards = new ArrayList<Card>();
-        for (int j = 0; j < ranks.length; j++) {
-            for (String suitString : suits) {
-                originalCards.add(new Card(ranks[j], suitString, values[j]));
-            }
-        }
-        for (int i = 0; i < originalCards.size(); i++) {
-            cards.add(originalCards.get(0));
-        }
-        for (int num = originalCards.size() - 1; num >= 0; num--) {
-            int psn = (int) ((num + 1) * Math.random());
-            cards.set(cards.size() - 1 - num, originalCards.get(psn));
-            originalCards.set(psn, originalCards.get(num));
-        }
-        size = cards.size();
+	for (int j = 0; j < ranks.length; j++) {
+		for (String suitString : suits) {
+				cards.add(new Card(ranks[j], suitString, values[j]));
+		}
+	}
+	size = cards.size();
+	shuffle();
+    }
+    
+    public Deck() {
+        cards = new ArrayList<Card>();
+        size = 0;
     }
 
-    public void addCard(String rank, String suit, int value) {
-        cards.add(new Card(rank, suit, value));
+    public void addCard(Card card) {
+        cards.add(card);
+        size++;
     }
     
     public Card getCard(int i) {
-        
+        return cards.get(i);
     }
     
     /**
