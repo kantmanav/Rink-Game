@@ -11,7 +11,9 @@ public abstract class Board {
     /**
      * The cards on this board.
      */
-    private Card[] cards;
+    private Card[] originalCards;
+    private Card[] compCards;
+    private Card[] playerCards;
 
     /**
      * The deck of cards being used to play the current game.
@@ -34,7 +36,7 @@ public abstract class Board {
      *                    the deck
      */
     public Board(int size, String[] ranks, String[] suits, int[] pointValues) {
-        cards = new Card[size];
+        originalCards = new Card[size];
         originalDeck = new Deck(ranks, suits, pointValues);
         if (I_AM_DEBUGGING) {
             System.out.println(originalDeck);
@@ -74,8 +76,8 @@ public abstract class Board {
      * which will be smaller near the end of a winning game.
      * @return the size of the board
      */
-    public int size() {
-        return cards.length;
+    public int compSize() {
+        return compCards.length;
     }
 
     /**
@@ -83,8 +85,8 @@ public abstract class Board {
      * @return true if this board is empty; false otherwise.
      */
     public boolean isEmpty() {
-        for (int k = 0; k < cards.length; k++) {
-            if (cards[k] != null) {
+        for (int k = 0; k < compCards.length; k++) {
+            if (compCards[k] != null) {
                 return false;
             }
         }
@@ -97,7 +99,7 @@ public abstract class Board {
      * @param k the index of the card to be dealt.
      */
     public void deal(int k) {
-        cards[k] = originalDeck.deal();
+        compCards[k] = compDeck.deal();
     }
 
     /**
@@ -105,7 +107,7 @@ public abstract class Board {
      * @return the number of undealt cards left in the deck.
      */
     public int deckSize() {
-        return originalDeck.size();
+        return compDeck.size();
     }
 
     /**
@@ -114,7 +116,7 @@ public abstract class Board {
      * @param k is the board position of the card to return.
      */
     public Card cardAt(int k) {
-        return cards[k];
+        return compCards[k];
     }
 
     /**
@@ -128,30 +130,34 @@ public abstract class Board {
         }
     }
 
-    /**
-     * Gets the indexes of the actual (non-null) cards on the board.
-     *
-     * @return a List that contains the locations (indexes)
-     *         of the non-null entries on the board.
-     */
-    public List<Integer> cardIndexes() {
-        List<Integer> selected = new ArrayList<Integer>();
-        for (int k = 0; k < cards.length; k++) {
-            if (cards[k] != null) {
-                selected.add(new Integer(k));
+        /**
+         * Gets the indexes of the actual (non-null) cards on the board.
+         *
+         * @return a List that contains the locations (indexes)
+         *         of the non-null entries on the board.
+         */
+        public List<Integer> cardIndexes() {
+            List<Integer> selected = new ArrayList<Integer>();
+            for (int k = 0; k < compCards.length; k++) {
+                if (compCards[k] != null) {
+                    selected.add(new Integer(k));
+                }
             }
+            return selected;
         }
-        return selected;
-    }
 
         /**
 	 * Generates and returns a string representation of this board.
 	 * @return the string version of this board.
 	 */
 	public String toString() {
-		String s = "";
-		for (int k = 0; k < cards.length; k++) {
-			s = s + k + ": " + cards[k] + "\n";
+		String s = "compCards:\n";
+		for (int k = 0; k < compCards.length; k++) {
+			s = s + k + ": " + compCards[k] + "\n";
+		}
+		s = s + "playerCards:\n";
+		for (int k = 0; k < playerCards.length; k++) {
+			s = s + k + ": " + playerCards[k] + "\n";
 		}
 		return s;
 	}
@@ -164,12 +170,20 @@ public abstract class Board {
 	 */
 	public boolean gameIsWon() {
 		if (compDeck.isEmpty()) {
-			for (Card c : cards) {
-				if (c != null) {
-					return false;
-				}
-			}
-			return true;
+			if (playerDeck.isEmpty()) {
+        		        for (Card c : compCards) {
+        				if (c != null) {
+        					return false;
+        				}
+        			}
+        			for (Card c : playerCards) {
+        				if (c != null) {
+        					return false;
+        				}
+        			}
+        			return true;
+                        }
+                        return false;
 		}
 		return false;
 	}
@@ -195,8 +209,11 @@ public abstract class Board {
 	 * Deal cards to this board to start the game.
 	 */
 	private void dealMyCards() {
-		for (int k = 0; k < cards.length; k++) {
-			cards[k] = originalDeck.deal();
+		for (int k = 0; k < compCards.length; k++) {
+			compCards[k] = compDeck.deal();
+		}
+		for (int k = 0; k < playerCards.length; k++) {
+			playerCards[k] = playerDeck.deal();
 		}
 	}
 }
